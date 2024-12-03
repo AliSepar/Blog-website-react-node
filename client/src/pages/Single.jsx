@@ -6,6 +6,7 @@ import Menu from "../components/Menu";
 import axios from "axios";
 import moment from "moment";
 import { AuthContext } from "../context/authContext";
+import DOMPurify from "dompurify";
 
 function Single() {
   const [post, setPost] = useState({});
@@ -40,11 +41,10 @@ function Single() {
     fetchData();
   }, [postId]);
 
-  console.log(post);
   return (
     <div className="single">
       <div className="content">
-        <img src={post?.img} alt="post Image" />
+        <img src={`../upload/${post.img}`} alt="post Image" />
         <div className="user">
           <img
             src={
@@ -54,13 +54,13 @@ function Single() {
             alt=""
           />
           <div className="info">
-            <span>John</span>
-            <p>Posted {moment(post.date).fromNow}</p>
+            <span>{post.username}</span>
+            <p>Posted {moment(post.date).fromNow()}</p>
             {/* moment will show the deffrence bettween the data from now */}
           </div>
           {currentUser.username === post.username && (
             <div className="edit">
-              <Link to={`/write?edit=2`}>
+              <Link to={`/write?edit=${postId}`} state={post}>
                 <img src={Edit} alt="" />
               </Link>
               <img onClick={handleDelete} src={Delete} alt="" />
@@ -69,9 +69,13 @@ function Single() {
         </div>
         {/* content */}
         <h1>{post?.title}</h1>
-        {post?.descrption}
+        <p
+          dangerouslySetInnerHTML={{
+            __html: DOMPurify.sanitize(post.descrption),
+          }}
+        ></p>
       </div>
-      <Menu />
+      <Menu cat={post.catagory} />
     </div>
   );
 }
